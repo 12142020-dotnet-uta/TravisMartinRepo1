@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "12142020_RpsGameMvc", "12142020_RpsGameMvc\12142020_RpsGameMvc.csproj", "{E19C25F7-1F21-4773-83F7-CD33E6762EED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E19C25F7-1F21-4773-83F7-CD33E6762EED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E19C25F7-1F21-4773-83F7-CD33E6762EED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E19C25F7-1F21-4773-83F7-CD33E6762EED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E19C25F7-1F21-4773-83F7-CD33E6762EED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {13C89E0F-B021-414F-9106-8FCF7169F998}
+	EndGlobalSection
+EndGlobal
