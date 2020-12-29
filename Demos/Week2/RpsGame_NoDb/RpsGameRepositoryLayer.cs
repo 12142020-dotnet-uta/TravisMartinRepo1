@@ -39,7 +39,7 @@ namespace RpsGame_NoDb
         }
 
         /// <summary>
-        /// Converts string input fornt he user to its int32 variant. If unsuccessful, returns -1
+        /// Converts string input from the user to its int32 variant. If unsuccessful, returns -1
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
