@@ -80,7 +80,7 @@ namespace TravisMartin_Project0.Migrations
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StoreLocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Ordertime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OrderQuantity = table.Column<int>(type: "int", nullable: false),
                     TotalOrderPrice = table.Column<double>(type: "float", nullable: false)
                 },
@@ -92,12 +92,6 @@ namespace TravisMartin_Project0.Migrations
                         column: x => x.CustomerId,
                         principalTable: "customers",
                         principalColumn: "CustomerId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_orders_products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "products",
-                        principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_orders_storeLocations_StoreLocationId",
@@ -123,11 +117,6 @@ namespace TravisMartin_Project0.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_orders_ProductId",
-                table: "orders",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_orders_StoreLocationId",
                 table: "orders",
                 column: "StoreLocationId");
@@ -142,10 +131,10 @@ namespace TravisMartin_Project0.Migrations
                 name: "orders");
 
             migrationBuilder.DropTable(
-                name: "customers");
+                name: "products");
 
             migrationBuilder.DropTable(
-                name: "products");
+                name: "customers");
 
             migrationBuilder.DropTable(
                 name: "storeLocations");

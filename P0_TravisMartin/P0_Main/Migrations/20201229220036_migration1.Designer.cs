@@ -10,8 +10,8 @@ using TravisMartin_Project0;
 namespace TravisMartin_Project0.Migrations
 {
     [DbContext(typeof(GameStopDBContext))]
-    [Migration("20201229095322_migration3")]
-    partial class migration3
+    [Migration("20201229220036_migration1")]
+    partial class migration1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
