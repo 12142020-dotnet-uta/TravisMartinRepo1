@@ -14,7 +14,7 @@ namespace TravisMartin_Project0
 
             Console.Clear();
             //storeContext.InitializeInventory(); // initializes products table, inventory table, and storelocations table
-            storeContext.ProductList();
+            storeContext.AddProducts();
             storeContext.AddStoreLocationsAndInventory();
 
             Console.WriteLine("Welcome to the Martin Store Application!");

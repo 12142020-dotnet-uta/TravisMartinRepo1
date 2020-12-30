@@ -5,23 +5,42 @@ using System.Linq;
 
 namespace TravisMartin_Project0
 {
-    public class GameStopRepositoryLayer
+    public class GameStopRepositoryLayer : GameStore
     {
-        static GameStopDBContext DBContext = new GameStopDBContext();
-        DbSet<Customer> customers = DBContext.customers;
-        DbSet<Product> products = DBContext.products;
-        DbSet<Inventory> inventory = DBContext.inventory;
-        DbSet<StoreLocation> storeLocations = DBContext.storeLocations;
-        DbSet<Order> orders = DBContext.orders;
+        GameStopDBContext DBContext = new GameStopDBContext();
+        DbSet<Customer> customers;
+        DbSet<Product> products;
+        DbSet<Inventory> inventory;
+        DbSet<StoreLocation> storeLocations;
+        DbSet<Order> orders;
+
+        // static GameStopDBContext DBContext = new GameStopDBContext();
+        // DbSet<Customer> customers = DBContext.customers;
+        // DbSet<Product> products = DBContext.products;
+        // DbSet<Inventory> inventory = DBContext.inventory;
+        // DbSet<StoreLocation> storeLocations = DBContext.storeLocations;
+        // DbSet<Order> orders = DBContext.orders;
 
         //public SortedDictionary<Products, int> productInventory = new SortedDictionary<Products, int>();
         public List<Product> listOfProducts = new List<Product>();
 
+
+        public GameStopRepositoryLayer() : this(new GameStopDBContext()){}
+
+        public GameStopRepositoryLayer(GameStopDBContext context) {
+            this.DBContext = context;
+            customers = DBContext.customers;
+            products = DBContext.products;
+            inventory = DBContext.inventory;
+            storeLocations = DBContext.storeLocations;
+            orders = DBContext.orders;
+        }
+        
         /// <summary>
         /// Initializes product table and adds each product to a list
         /// </summary>
         /// <returns></returns>
-        public List<Product> ProductList() {
+        public void AddProducts() {
 
             if (!products.Any()) {
                 Product p1 = new Product("Ps4 game: Ghost of Tsushima", 39.99, "In the late 13th century, a ruthless Mongol army invades Tsushima in a quest to conquer all of japan-But for Jin Saki, one of the last surviving samurai defenders, the battle has just begun. Set aside samurai tradition and forge a new path, the path of the ghost, as you wage an unconventional war for the freedom of Japan.");
@@ -46,8 +65,6 @@ namespace TravisMartin_Project0
             }
 
             DBContext.SaveChanges();
-
-            return listOfProducts;
         }
 
         /// <summary>
@@ -216,9 +233,11 @@ namespace TravisMartin_Project0
 
         /// <summary>
         /// Prints all orders in the Order table with same Customer Name
+        /// TODO throws null reference exception if there are multiple customers or stores in Order table
         /// </summary>
         /// <param name="customer"></param>
-        public void CustomerOrderHistory(Customer customer) {
+        public int CustomerOrderHistory(Customer customer) {
+            int numOfOrders = 0;
             var customerOrders =    from o in orders
                                     where o.Customers == customer
                                     select o;
@@ -229,17 +248,23 @@ namespace TravisMartin_Project0
                 Console.WriteLine($"\tProduct name: {o.ProductName}");
                 Console.WriteLine($"\tOrder quantity: {o.OrderQuantity}");
                 Console.WriteLine($"\tTotal price: {o.TotalOrderPrice}");
+                numOfOrders++;
             }
+
+            return numOfOrders;
         } 
 
         /// <summary>
         /// Prints all orders in the Order table with the same Store Location
+        /// TODO throws null reference exception if there are multiple customers or stores in Order table
         /// </summary>
         /// <param name="storeLocation"></param>
-        public void StoreOrderHistory(StoreLocation storeLocation) {
+        public int StoreOrderHistory(StoreLocation storeLocation) {
+            int numOfOrders = 0;
             var storeOrders =    from o in orders
                                     where o.StoreLocations == storeLocation
                                     select o;
+                
             foreach (Order o in storeOrders) {
                 Console.WriteLine($"\n\tCustomer name: {o.Customers.Fname}"); 
                 Console.WriteLine($"\tStore location: {o.StoreLocations.Location}"); 
@@ -247,7 +272,10 @@ namespace TravisMartin_Project0
                 Console.WriteLine($"\tProduct name: {o.ProductName}");
                 Console.WriteLine($"\tOrder quantity: {o.OrderQuantity}");
                 Console.WriteLine($"\tTotal price: {o.TotalOrderPrice}");
+                numOfOrders++;
             }
+
+            return numOfOrders;
         } 
 
     }
