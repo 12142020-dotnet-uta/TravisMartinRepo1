@@ -1,13 +1,12 @@
+using BusinessLogicLayer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RepositoryLayer;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace P1_TravisMartin
 {
@@ -24,6 +23,11 @@ namespace P1_TravisMartin
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddScoped<GameStopDBContext>();
+            services.AddScoped<GameStopRepository>();
+            services.AddScoped<BusinessLogicClass>();
+            services.AddScoped<MapperClass>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,7 +47,7 @@ namespace P1_TravisMartin
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication(); // added this to use authentication
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
