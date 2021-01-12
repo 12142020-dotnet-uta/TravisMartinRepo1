@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ModelLayer.ViewModels
 {
-    public class ProductViewModel
+    public class CartViewModel
     {
+        public Guid CartId { get; set; } = Guid.NewGuid();
+        public Guid CustomerId { get; set; } = Guid.NewGuid();
+        public Guid LocationId { get; set; } = Guid.NewGuid();
         public Guid ProductId { get; set; } = Guid.NewGuid();
 
         [DisplayName("PS4 Game Name")]
@@ -21,13 +22,6 @@ namespace ModelLayer.ViewModels
         public string ProductDescription { get; set; } // brief description of product
         [DisplayName("Image of Game")]
         public string JpgStringImage { get; set; }
-        [DisplayName("Amount Available")]
-        public int ProductQuantity { get; set; } // number of each product
-
-        [DisplayName("How much do you want?")]
-        [Range(1, 3)]
-        [Required]
         public int AmountChosen { get; set; } // number of products to put in cart
-
     }
 }

@@ -1,0 +1,86 @@
+﻿@model IEnumerable<ModelLayer.Models.Order>
+
+@{
+    ViewData["Title"] = "StoreOrderHistory";
+}
+
+<h1>StoreOrderHistory</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            @*<th>
+            @Html.DisplayNameFor(model => model.OrderId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CustomerId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StoreLocationId)
+            </th>
+                <th>
+                @Html.DisplayNameFor(model => model.ProductId)
+            </th>*@
+            <th>
+                @Html.DisplayNameFor(model => model.Customers.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StoreLocations.Location)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products.ProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ordertime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderQuantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalOrderPrice)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            @*<td>
+            @Html.DisplayFor(modelItem => item.OrderId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CustomerId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StoreLocationId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductId)
+            </td>*@
+            <td>
+                @Html.DisplayFor(modelItem => item.Customers.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StoreLocations.Location)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Products.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ordertime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderQuantity)
+            </td>
+            <td>
+                $@Html.DisplayFor(modelItem => item.TotalOrderPrice)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<a asp-action="Index">Back to Home</a>

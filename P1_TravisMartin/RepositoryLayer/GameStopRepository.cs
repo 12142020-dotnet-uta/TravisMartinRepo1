@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModelLayer.Models;
+using ModelLayer.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -136,6 +137,7 @@ namespace RepositoryLayer
             return inventories.ToList();
         }
 
+
         /// <summary>
         /// Iniializes each store location to have a full inventory of products
         /// </summary>
@@ -208,5 +210,132 @@ namespace RepositoryLayer
             _dbContext.SaveChanges();
         }
 
-    }
-}
+
+        public List<Product> AddToCart(ProductViewModel productViewModel)
+        {
+            var cartItem =  from p in products
+                            where p.ProductId == productViewModel.ProductId
+                            select p;
+            List<Product> cartList = cartItem.ToList();
+            return cartList;
+        }
+
+        /// <summary>
+        /// Takes in a customer, storeLocation, productQuantity, and product in order to populate the Order table 1 entry at a time
+        /// TODO had to use productName instead of productId in Order table because I kept getting errors about duplicate primary keys in the product table
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <param name="storeLocation"></param>
+        /// <param name="productQuantity"></param>
+        /// <param name="product"></param>
+        public void OrderHistory(string custName, string storeLocation, ProductViewModel productViewModel)
+        {
+            var cust = from c in customers
+                           where c.UserName == custName
+                           select c;
+            List<Customer> custList = cust.ToList();
+
+            var store = from s in storeLocations
+                       where s.Location == storeLocation
+                       select s;
+            List<StoreLocation> locationList = store.ToList();
+
+            var product = from p in products
+                        where p.ProductId == productViewModel.ProductId
+                        select p;
+            List<Product> productList = product.ToList();
+
+            Order order = new Order();
+            order.Customers = custList[0];
+            order.StoreLocations = locationList[0];
+            order.OrderQuantity = productViewModel.AmountChosen;
+            order.Ordertime = DateTime.Now;
+            order.TotalOrderPrice = productViewModel.AmountChosen * productList[0].ProductPrice;
+            order.Products = productList[0];
+
+            orders.Add(order);
+            _dbContext.SaveChanges();
+
+            UpdateInventory(productList[0], locationList[0], productViewModel.AmountChosen);
+        }
+
+        /// <summary>
+        /// Decrements the inventory when a customer checks out with at least 1 product
+        /// </summary>
+        /// <param name="product"></param>
+        /// <param name="storeLocation"></param>
+        /// <param name="productQuantity"></param>
+        public void UpdateInventory(Product product, StoreLocation storeLocation, int productQuantity)
+        {
+            var decrementInventory = from i in inventories
+                                     where i.Products == product & i.StoreLocations == storeLocation
+                                     select i;
+
+            foreach (Inventory i in decrementInventory)
+            {
+                i.ProductQuantity -= productQuantity;
+            }
+
+            _dbContext.SaveChanges();
+        }
+
+        public List<Order> CustomerOrderHistory(string custId)
+        {
+            List<Customer> custList = new List<Customer>();
+            var user = from c in customers
+                        where c.UserName == custId
+                        select c;
+            custList = user.ToList();
+       
+            List<Order> orderList = new List<Order>();
+            var customerOrders = from o in orders
+                                    where o.CustomerId == custList[0].CustomerId
+                                    select o;
+            orderList = customerOrders.ToList();
+
+            foreach (Order o in orderList)
+            {
+                var product = from p in products
+                              where p.ProductId == o.ProductId
+                              select p;
+                o.Products = product.ToList()[0];
+
+                var store = from s in storeLocations
+                            where s.LocationId == o.StoreLocationId
+                            select s;
+                o.StoreLocations = store.ToList()[0];
+            }
+            return orderList;
+        }
+
+        public List<Order> StoreOrderHistory(StoreViewModel storeViewModel)
+        {
+            List<StoreLocation> storeList = new List<StoreLocation>();
+            var store = from s in storeLocations
+                        where s.Location == storeViewModel.Location
+                        select s;
+            storeList = store.ToList();
+
+            List<Order> orderList = new List<Order>();
+            var storeOrders = from o in orders
+                                 where o.StoreLocationId == storeList[0].LocationId
+                                 select o;
+            orderList = storeOrders.ToList();
+
+            foreach (Order o in orderList)
+            {
+                var product = from p in products
+                              where p.ProductId == o.ProductId
+                              select p;
+                o.Products = product.ToList()[0];
+
+                var user = from c in customers
+                            where c.CustomerId == o.CustomerId
+                            select c;
+                o.Customers = user.ToList()[0];
+            }
+            return orderList;
+        }
+
+    } // end of class
+} // end of namespace

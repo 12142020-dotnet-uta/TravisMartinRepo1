@@ -1,0 +1,25 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@{ 
+    @inject IHttpContextAccessor HttpContextAccessor
+    var isFiltered = @HttpContextAccessor.HttpContext.Session.GetString("_UserName");
+}
+
+<p id="username" style="display:none">@isFiltered</p>
+
+<a asp-action="CustomerOrderHistory">View Customer Order History</a>
+<br />
+<br />
+<a asp-action="ChooseStore">View Store Order History</a>
+
+<script>
+    var content = document.GetElementById("username").textContent;
+    console.log("content is " + content);
+    document.getElementById("LoginController").innerHTML = content;
+</script>
+
+

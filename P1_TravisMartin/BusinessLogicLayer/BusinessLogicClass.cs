@@ -33,6 +33,7 @@ namespace BusinessLogicLayer
             // taking in customer input to register new customer
             Customer customer = new Customer()
             {
+                CustomerId = registrationViewModel.CustomerId,
                 FName = registrationViewModel.FName,
                 LName = registrationViewModel.LName,
                 Email = registrationViewModel.Email,
@@ -59,11 +60,13 @@ namespace BusinessLogicLayer
              return customer1;
         }
 
+
         public Customer LoginCustomer(LoginViewModel loginViewModel)
         {
             // taking in customer input to login customer
             Customer customer = new Customer()
             {
+                CustomerId = loginViewModel.CustomerId,
                 UserName = loginViewModel.UserName,
                 Password = loginViewModel.Password
             };
@@ -115,6 +118,51 @@ namespace BusinessLogicLayer
             return storeViewModelList;
         }
 
+
+        public List<ProductViewModel> AddToCart(ProductViewModel productViewModel)
+        {
+            List<Product> cart = _repository.AddToCart(productViewModel);
+
+            List<ProductViewModel> cartList = new List<ProductViewModel>();
+            foreach (Product p in cart)
+            {
+                cartList.Add(_mapperClass.ConvertProductToProductViewModel(p));
+            }
+            return cartList;
+        }
+
+        public void OrderHistory(string custName, string storeLocation, ProductViewModel productViewModel)
+        {
+            _repository.OrderHistory(custName, storeLocation, productViewModel);
+        }
+
+        public List<Order> CustomerOrderHistory(string custId)
+        {
+            List<Order> orderList = _repository.CustomerOrderHistory(custId);
+            /*List<OrderViewModel> orderViewModelList = new List<OrderViewModel>();
+            foreach (Order o in orderList)
+            {
+                orderViewModelList.Add(ConvertOrderToOrderViewModel(o));
+            }*/
+            return orderList;
+        }
+
+        public List<Order> StoreOrderHistory(StoreViewModel storeViewModel)
+        {
+            List<Order> orderList = _repository.StoreOrderHistory(storeViewModel);
+            return orderList;
+        }
+
+        /*internal OrderViewModel ConvertOrderToOrderViewModel(Order order)
+        {
+            OrderViewModel orderViewModel = new OrderViewModel()
+            {
+                Customers = order.Customers,
+                StoreLocations = order.StoreLocations,
+
+            }
+        }*/
+
         internal StoreViewModel ConvertStoreLocationToStoreViewModel(StoreLocation s)
         {
 
@@ -128,6 +176,7 @@ namespace BusinessLogicLayer
             return storeViewModel;
         }
 
+
         internal StoreViewModel ConvertStoreLocationToStoreViewModel2(StoreLocation s)
         {
 
@@ -139,6 +188,8 @@ namespace BusinessLogicLayer
 
             return storeViewModel;
         }
+
+
         internal InventoryViewModel ConvertInventoryToInventoryViewModel(Inventory i, Product p, StoreLocation s)
         {
             InventoryViewModel inventoryViewModel = new InventoryViewModel()

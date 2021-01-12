@@ -5,6 +5,7 @@ namespace ModelLayer.ViewModels
 {
     public class RegistrationViewModel
     {
+        public Guid CustomerId { get; set; } = Guid.NewGuid();
 
         [StringLength(20, MinimumLength = 3, ErrorMessage = "The first name must be from 3-20 characters in length.")]
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "No numbers allowed in the first name.")]
