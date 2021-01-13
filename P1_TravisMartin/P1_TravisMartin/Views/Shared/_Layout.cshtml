@@ -11,22 +11,42 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img class="img-responsive" src="~/images/gamestop-logo.jpg" alt="No Image Found" style="height:80px" /></a>
+                <a class="navbar-brand" asp-area="" asp-controller="Store" asp-action="Index"><img class="img-responsive" src="~/images/gamestop-logo.jpg" alt="No Image Found" style="height:60px; width: 200px" /></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Login">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Login" asp-action="Registration">Register</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Stores">Stores</a>
-                        </li>
+                        @{
+                            var sessionName = new Byte[20];
+                            bool nameOk = Context.Session.TryGetValue("_UserName", out sessionName);
+                            if (!nameOk)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Login">Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Registration">Register</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Logout">Logout</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Stores">Stores</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a id="User" class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Index"></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Store" asp-action="Cart">Cart</a>
+                                </li>
+                            }
+                        }
+
                     </ul>
                 </div>
             </div>
@@ -34,6 +54,23 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            @using Microsoft.AspNetCore.Http;
+            @{ 
+                @inject IHttpContextAccessor HttpContextAccessor
+                string username = "";
+                var isFiltered = HttpContextAccessor.HttpContext.Session.GetString("_UserName");
+                if (isFiltered != null)
+                {
+                    username = "Welcome " + (string)isFiltered;
+                }
+            }
+
+            <p id="username" style="display:none">@username</p>
+            <script>
+                var content = document.getElementById("username").textContent;
+                console.log("content is " + content);
+                document.getElementById("User").innerHTML = content;
+            </script>
             @RenderBody()
         </main>
     </div>

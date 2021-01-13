@@ -12,6 +12,11 @@ namespace BusinessLogicLayer
     public class MapperClass
     {
 
+        /// <summary>
+        /// Converts the Customer db context model to CustoemrViewModel
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns></returns>
         internal CustomerViewModel ConvertCustomerToCustomerViewModel(Customer customer)
         {
             CustomerViewModel customerViewModel = new CustomerViewModel()
@@ -27,6 +32,11 @@ namespace BusinessLogicLayer
             return customerViewModel;
         }
 
+        /// <summary>
+        /// Converts the Product db context model to ProductViewModel
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
         internal ProductViewModel ConvertProductToProductViewModel(Product p)
         {
             ProductViewModel productViewModel = new ProductViewModel()
@@ -41,6 +51,11 @@ namespace BusinessLogicLayer
             return productViewModel;
         }
 
+        /// <summary>
+        /// Converts an image stored in a byte array to a jpg string to store in the view model
+        /// </summary>
+        /// <param name="byteArray"></param>
+        /// <returns></returns>
         private string ConvertByteArrayToJpgString(byte[] byteArray)
         {
             if (byteArray != null)

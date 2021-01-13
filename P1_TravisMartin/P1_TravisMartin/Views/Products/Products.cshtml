@@ -10,58 +10,77 @@
     <!--Show details are saved successfully message-->
     <div class="col-lg-12">@ViewBag.Message</div>
 </div>
+    <table class="table">
+        <thead>
+            <tr>
+                @*<th>
+                        @Html.DisplayNameFor(model => model.ProductId)
+                    </th>*@
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductPrice)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductDescription)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.JpgStringImage)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductQuantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.AmountChosen)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
 
-<table class="table">
-    <thead>
-        <tr>
-            @*<th>
-            @Html.DisplayNameFor(model => model.ProductId)
-        </th>*@
-            <th>
-                @Html.DisplayNameFor(model => model.ProductName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductPrice)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductDescription)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.JpgStringImage)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductQuantity)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-        <tr>
-            @*<td>
-                @Html.DisplayFor(modelItem => item.ProductId)
-            </td>*@
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductName)
-            </td>
-            <td>
-                <span>$@Html.DisplayFor(modelItem => item.ProductPrice)</span>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductDescription)
-            </td>
-            <td>
-                <img class="img-responsive" src="@item.JpgStringImage" alt="No Image Found" style="height:100px" />
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductQuantity)
-            </td>
-            <td>
-                <!--<a asp-controller="Cart" asp-action="AddToCart">Add to cart</a><br /><br />-->
-                <input type="submit" value="Add to Cart"/>
-            </td>
-        </tr>
-        }
-    </tbody>
-</table>
+            @foreach (var item in Model)
+            {
+            <tr>
+                @*<td>
+            @Html.DisplayFor(modelItem => item.ProductId)
+        </td>*@
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductName)
+                </td>
+                <td>
+                    <span>$@Html.DisplayFor(modelItem => item.ProductPrice)</span>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductDescription)
+                </td>
+                <td>
+                    <img class="img-responsive" src="@item.JpgStringImage" alt="No Image Found" style="height:100px" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductQuantity)
+                </td>
+                @if (item.ProductQuantity > 0)
+                {
+                    using (Html.BeginForm("Cart", "Store", new { ProductId = item.ProductId }, FormMethod.Post))
+                    {
+                        <td>
+                            @*Html.TextBoxFor(modelItem => item.AmountChosen)*@
+                            <button type="submit" class="btn btn-primary">Add to Cart</button>
+                        </td>
+                    }
+
+                }
+                else
+                {
+                    @*Html.DisplayText("Product not Available")*@
+                    <td>
+                        @Html.TextBox("AmountChosen", "Product Not Available", new { @disabled = "disabled" })
+                    </td>
+                }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+

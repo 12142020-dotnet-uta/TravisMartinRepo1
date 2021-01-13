@@ -5,6 +5,7 @@ namespace ModelLayer.ViewModels
 {
     public class LoginViewModel
     {
+        public Guid CustomerId { get; set; } = Guid.NewGuid();
 
         [StringLength(20, MinimumLength = 3, ErrorMessage = "The username must be from 3-20 characters in length.")]
         [Required]
@@ -16,5 +17,6 @@ namespace ModelLayer.ViewModels
         [Required]
         [Display(Name = "Password")]
         public string Password { get; set; } // customer password used login
+
     }
 }

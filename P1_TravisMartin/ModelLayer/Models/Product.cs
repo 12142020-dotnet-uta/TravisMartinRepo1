@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,6 +17,7 @@ namespace ModelLayer.Models
         [Key]
         public Guid ProductId { get; set; } = Guid.NewGuid();
 
+        [DisplayName("PS4 Game Name")]
         public string ProductName { get; set; } // name of product
         public double ProductPrice { get; set; } // price of product
         public string ProductDescription { get; set; } // brief description of product

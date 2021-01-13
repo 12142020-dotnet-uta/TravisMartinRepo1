@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModelLayer.Models;
+using ModelLayer.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,15 +15,20 @@ namespace RepositoryLayer
 
 		private readonly ILogger<GameStopRepository> _logger;
 
-		private readonly GameStopDBContext _dbContext;
-		DbSet<Customer> customers;
-		DbSet<Product> products;
-		DbSet<StoreLocation> storeLocations;
-		DbSet<Order> orders;
-		DbSet<Inventory> inventories;
+		private readonly GameStopDBContext _dbContext; // gloabl variable to access db context
+		DbSet<Customer> customers; // global variable to access Customer table
+		DbSet<Product> products; // global variable to access Product table
+		DbSet<StoreLocation> storeLocations; // global variable to access StoreLocation table
+		DbSet<Order> orders; // global variable to access Order table
+		DbSet<Inventory> inventories; // global variable to access Inventory table
 
-        private List<Product> productList = new List<Product>();
+        private List<Product> productList = new List<Product>(); // contains products from Product table
 
+        /// <summary>
+        /// Has dependency injection for accessing db context variables
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="logger"></param>
 		public GameStopRepository(GameStopDBContext dbContext, ILogger<GameStopRepository> logger)
 		{
 			_dbContext = dbContext;
@@ -33,7 +39,12 @@ namespace RepositoryLayer
 			this.orders = _dbContext.orders;
 			_logger = logger;
 		}
-
+         /// <summary>
+         /// Query the Customer table to see if user already exists
+         /// Checks to see if email and usernam are unique before adding new user
+         /// </summary>
+         /// <param name="customer"></param>
+         /// <returns></returns>
 		public Customer ValidateCustomer(Customer customer)
         {
 			// checks if the customer is in the database
@@ -69,6 +80,12 @@ namespace RepositoryLayer
             }
         }
 
+        /// <summary>
+        /// Queries the Customer table to see if uesr exists
+        /// Checks username and password to see if they are in table, then allows user to login
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns></returns>
         public Customer ValidateLogin(Customer customer)
         {
 			// checks if the customer is in the database
@@ -83,11 +100,27 @@ namespace RepositoryLayer
             }
 		}
 
-		/// <summary>
-		/// Initializes product table and adds each product to a list
-		/// </summary>
-		/// <returns></returns>
-		public void AddProducts()
+        /// <summary>
+        /// Queries Customer table with specified email to find existing user
+        /// </summary>
+        /// <param name="customerViewModel"></param>
+        /// <returns></returns>
+        public List<Customer> SearchCustomers(CustomerViewModel customerViewModel)
+        {
+            var custList = from c in customers
+                           where c.Email == customerViewModel.Email
+                           select c;
+
+            List<Customer> searchList = custList.ToList();
+            return searchList;
+        }
+
+
+        /// <summary>
+        /// Initializes product table and adds each product to a list
+        /// </summary>
+        /// <returns></returns>
+        public void AddProducts()
 		{
 
 			if (!products.Any())
@@ -121,23 +154,36 @@ namespace RepositoryLayer
 			_dbContext.SaveChanges();
 		}
 
+        /// <summary>
+        /// Returns a list of StoreLocation gotten from StoreLocation table
+        /// </summary>
+        /// <returns></returns>
         public List<StoreLocation> StoreList()
         {
             return storeLocations.ToList();
         }
 
+        /// <summary>
+        /// Returns a list of Product gotten from Product table
+        /// </summary>
+        /// <returns></returns>
         public List<Product> ProductList()
         {
 			return products.ToList();
         }
 
+        /// <summary>
+        /// Returns a list of Inventory gotten from Inventory table
+        /// </summary>
+        /// <returns></returns>
         public List<Inventory> InventoryList()
         {
             return inventories.ToList();
         }
 
+
         /// <summary>
-        /// Iniializes each store location to have a full inventory of products
+        /// Adds Store Locations to StoreLocation table and populates Inventory table with all products from every location
         /// </summary>
         public void AddStoreLocationsAndInventory()
         {
@@ -208,5 +254,154 @@ namespace RepositoryLayer
             _dbContext.SaveChanges();
         }
 
-    }
-}
+        /// <summary>
+        /// Queries Product table with specified ProductId and returns a list of Product to add to cart
+        /// </summary>
+        /// <param name="productViewModel"></param>
+        /// <returns></returns>
+        public List<Product> AddToCart(ProductViewModel productViewModel)
+        {
+            var cartItem =  from p in products
+                            where p.ProductId == productViewModel.ProductId
+                            select p;
+            List<Product> cartList = cartItem.ToList();
+            return cartList;
+        }
+
+        /// <summary>
+        /// Takes in a Customer username, Store Location location, and ProductId in order to populate the Order table with a new order
+        /// Also decrements inventory by specified product amount user bought
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <param name="storeLocation"></param>
+        /// <param name="productQuantity"></param>
+        /// <param name="product"></param>
+        public void OrderHistory(string custName, string storeLocation, ProductViewModel productViewModel)
+        {
+            var cust = from c in customers
+                           where c.UserName == custName
+                           select c;
+            List<Customer> custList = cust.ToList();
+
+            var store = from s in storeLocations
+                       where s.Location == storeLocation
+                       select s;
+            List<StoreLocation> locationList = store.ToList();
+
+            var product = from p in products
+                        where p.ProductId == productViewModel.ProductId
+                        select p;
+            List<Product> productList = product.ToList();
+
+            try
+            {
+                Order order = new Order();
+                order.Customers = custList[0];
+                order.StoreLocations = locationList[0];
+                order.OrderQuantity = productViewModel.AmountChosen;
+                order.Ordertime = DateTime.Now;
+                order.TotalOrderPrice = productViewModel.AmountChosen * productList[0].ProductPrice;
+                order.Products = productList[0];
+                orders.Add(order);
+                UpdateInventory(productList[0], locationList[0], productViewModel.AmountChosen);
+                _dbContext.SaveChanges();
+            } catch(ArgumentOutOfRangeException aore)
+            {
+                _logger.LogInformation($"Trying to purchase beyond the remaining inventory threw an error, {aore}");
+            } catch(DbUpdateException dbue)
+            {
+                _logger.LogInformation($"Saving an empty customer to the Db threw an error, {dbue}");
+            }
+     
+        }
+
+        /// <summary>
+        /// Decrements the inventory when a customer checks out with at least 1 product
+        /// </summary>
+        /// <param name="product"></param>
+        /// <param name="storeLocation"></param>
+        /// <param name="productQuantity"></param>
+        public void UpdateInventory(Product product, StoreLocation storeLocation, int productQuantity)
+        {
+            var decrementInventory = from i in inventories
+                                     where i.Products == product & i.StoreLocations == storeLocation
+                                     select i;
+
+            foreach (Inventory i in decrementInventory)
+            {
+                i.ProductQuantity -= productQuantity;
+            }
+
+            _dbContext.SaveChanges();
+        }
+
+        /// <summary>
+        /// Takes in a CustomerID and returns all orders from the Order table by specified user
+        /// </summary>
+        /// <param name="custId"></param>
+        /// <returns></returns>
+        public List<Order> CustomerOrderHistory(string custId)
+        {
+            List<Customer> custList = new List<Customer>();
+            var user = from c in customers
+                        where c.UserName == custId
+                        select c;
+            custList = user.ToList();
+       
+            List<Order> orderList = new List<Order>();
+            var customerOrders = from o in orders
+                                    where o.CustomerId == custList[0].CustomerId
+                                    select o;
+            orderList = customerOrders.ToList();
+
+            foreach (Order o in orderList)
+            {
+                var product = from p in products
+                              where p.ProductId == o.ProductId
+                              select p;
+                o.Products = product.ToList()[0];
+
+                var store = from s in storeLocations
+                            where s.LocationId == o.StoreLocationId
+                            select s;
+                o.StoreLocations = store.ToList()[0];
+            }
+            return orderList;
+        }
+
+        /// <summary>
+        /// Takes in a StoreViewModel location to query Order table for all orders at location
+        /// </summary>
+        /// <param name="storeViewModel"></param>
+        /// <returns></returns>
+        public List<Order> StoreOrderHistory(StoreViewModel storeViewModel)
+        {
+            List<StoreLocation> storeList = new List<StoreLocation>();
+            var store = from s in storeLocations
+                        where s.Location == storeViewModel.Location
+                        select s;
+            storeList = store.ToList();
+
+            List<Order> orderList = new List<Order>();
+            var storeOrders = from o in orders
+                                 where o.StoreLocationId == storeList[0].LocationId
+                                 select o;
+            orderList = storeOrders.ToList();
+
+            foreach (Order o in orderList)
+            {
+                var product = from p in products
+                              where p.ProductId == o.ProductId
+                              select p;
+                o.Products = product.ToList()[0];
+
+                var user = from c in customers
+                            where c.CustomerId == o.CustomerId
+                            select c;
+                o.Customers = user.ToList()[0];
+            }
+            return orderList;
+        }
+
+    } // end of class
+} // end of namespace

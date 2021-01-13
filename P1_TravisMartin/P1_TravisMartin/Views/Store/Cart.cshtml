@@ -1,0 +1,82 @@
+﻿@model ModelLayer.ViewModels.ProductViewModel
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+<h1>Cart</h1>
+
+<div>
+    <h4>ProductViewModel</h4>
+    <hr />
+        <form asp-action="Checkout">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <dl class="row">
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.ProductId)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.ProductId)
+                    <input asp-for="ProductId" class="form-control" type="hidden" />
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.ProductName)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.ProductName)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.ProductPrice)
+                </dt>
+                <dd class="col-sm-10">
+                    $@Html.DisplayFor(model => model.ProductPrice)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.ProductDescription)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.ProductDescription)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.JpgStringImage)
+                </dt>
+                <dd class="col-sm-10">
+                    <img class="img-responsive" src="@Model.JpgStringImage" alt="No Image Found" style="height:100px" />
+                </dd>
+                <dt class = "col-sm-2" hidden>
+                     @Html.DisplayNameFor(model => model.ProductQuantity)
+                </dt>
+                <dd class = "col-sm-10" hidden>
+                    @Html.DisplayFor(model => model.ProductQuantity)
+                </dd>
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.AmountChosen)
+                </dt>
+                <dd class="col-sm-10">
+                    @*<input id="chosenAmount" asp-for="AmountChosen" class="form-control" value="1"/>
+        <span asp-validation-for="AmountChosen" class="text-danger"></span>*@
+
+
+                    @if (Model.ProductQuantity > 4)
+                    {
+                        @Html.TextBoxFor(model => model.AmountChosen, new { type = "number", min = "1", max = Model.ProductQuantity.ToString() });
+                        @Html.ValidationMessageFor(m => m.AmountChosen, "Can't choose number greater than remaining store inventory", new { @class = "text-danger" });
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(model => model.AmountChosen, new { type = "number", min = "1", max = "3" })
+                        @Html.ValidationMessageFor(m => m.AmountChosen, "Please Choose a value between 1 and 3", new { @class = "text-danger" })
+                    }
+
+                </dd>
+            </dl>
+            <div class="form-group">
+                <input type="submit" value="Checkout" class="btn btn-primary" />
+            </div>
+            
+        </form>
+    </div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to Home</a>
+</div>
