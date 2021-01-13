@@ -43,8 +43,8 @@
             {
             <tr>
                 @*<td>
-                    @Html.DisplayFor(modelItem => item.ProductId)
-                </td>*@
+            @Html.DisplayFor(modelItem => item.ProductId)
+        </td>*@
                 <td>
                     @Html.DisplayFor(modelItem => item.ProductName)
                 </td>
@@ -70,11 +70,15 @@
                         </td>
                     }
 
-                } else
-                {
-                    Html.DisplayText("Product not Available");
                 }
-             </tr>
+                else
+                {
+                    @*Html.DisplayText("Product not Available")*@
+                    <td>
+                        @Html.TextBox("AmountChosen", "Product Not Available", new { @disabled = "disabled" })
+                    </td>
+                }
+                </tr>
             }
         </tbody>
     </table>

@@ -11,10 +11,16 @@ namespace BusinessLogicLayer
     public class BusinessLogicClass
     {
 
-        private readonly GameStopRepository _repository;
-        private readonly MapperClass _mapperClass;
+        private readonly GameStopRepository _repository; // global variable to access repository layer
+        private readonly MapperClass _mapperClass; // gloable variable to access mapper layer
         private readonly ILogger<BusinessLogicClass> _logger;
 
+        /// <summary>
+        /// Dependency injection for global variables
+        /// </summary>
+        /// <param name="repository"></param>
+        /// <param name="mapperClass"></param>
+        /// <param name="logger"></param>
         public BusinessLogicClass(GameStopRepository repository, MapperClass mapperClass, ILogger<BusinessLogicClass> logger)
         {
             _repository = repository;
@@ -24,7 +30,6 @@ namespace BusinessLogicLayer
 
         /// <summary>
         /// Registers new customer
-        /// TODO: Might make return type CustomerViewModel if needed
         /// </summary>
         /// <param name="registrationViewModel"></param>
         /// <returns></returns>
@@ -45,22 +50,14 @@ namespace BusinessLogicLayer
             Customer customer1 = _repository.ValidateCustomer(customer);
             CustomerViewModel customerViewModel = new CustomerViewModel();
 
-            // if registered customer already exists, returns null; so try/catch block will handle that case
-            /*try 
-            {
-                // converts the new Customer object to a CustomerViewModel object
-                customerViewModel = _mapperClass.ConvertCustomerToCustomerViewModel(customer1);
-                return customerViewModel;
-            } catch(ArgumentNullException ane)
-            {
-                _logger.LogInformation($"Saving a customer to the Db threw an error, {ane}");
-            }*/
-
-            // TODO: may change return type or return null
              return customer1;
         }
 
-
+        /// <summary>
+        /// Login existing customer
+        /// </summary>
+        /// <param name="loginViewModel"></param>
+        /// <returns></returns>
         public Customer LoginCustomer(LoginViewModel loginViewModel)
         {
             // taking in customer input to login customer
@@ -76,6 +73,11 @@ namespace BusinessLogicLayer
             return customer1;
         }
 
+        /// <summary>
+        /// Gets the Product List from the repository layer, converts it to ProductViewModel List, and returns converted list
+        /// </summary>
+        /// <param name="storeViewModel"></param>
+        /// <returns></returns>
         public List<ProductViewModel> ProductsList(StoreViewModel storeViewModel)
         {
             
@@ -99,6 +101,27 @@ namespace BusinessLogicLayer
             return productViewModelList;
         }
 
+        /// <summary>
+        /// Takes user email from user, passes it to repository layer, converts returned Customer List to CustomerViewModel List, 
+        /// and returns converted list with searched for user
+        /// </summary>
+        /// <param name="customerViewModel"></param>
+        /// <returns></returns>
+        public List<CustomerViewModel> SearchCustomers(CustomerViewModel customerViewModel)
+        {
+            List<Customer> customerList = _repository.SearchCustomers(customerViewModel);
+            List<CustomerViewModel> customerViewModelList = new List<CustomerViewModel>();
+            foreach(Customer c in customerList)
+            {
+                customerViewModelList.Add(_mapperClass.ConvertCustomerToCustomerViewModel(c));
+            }
+            return customerViewModelList;
+        }
+
+        /// <summary>
+        /// Calls methods from repsoitory layer to add products and store locations to their respective tables in the database
+        /// </summary>
+        /// <returns></returns>
         public List<StoreViewModel> StoresList()
         {
             // adds products to databse if table is empty
@@ -118,7 +141,11 @@ namespace BusinessLogicLayer
             return storeViewModelList;
         }
 
-
+        /// <summary>
+        /// Calls repository layer to add product to cart
+        /// </summary>
+        /// <param name="productViewModel"></param>
+        /// <returns></returns>
         public List<ProductViewModel> AddToCart(ProductViewModel productViewModel)
         {
             List<Product> cart = _repository.AddToCart(productViewModel);
@@ -131,11 +158,22 @@ namespace BusinessLogicLayer
             return cartList;
         }
 
+        /// <summary>
+        /// Calls repository layer to populate Order table with a new order after checkout
+        /// </summary>
+        /// <param name="custName"></param>
+        /// <param name="storeLocation"></param>
+        /// <param name="productViewModel"></param>
         public void OrderHistory(string custName, string storeLocation, ProductViewModel productViewModel)
         {
             _repository.OrderHistory(custName, storeLocation, productViewModel);
         }
 
+        /// <summary>
+        /// Calls repository layer to query Order table for all orders by current user
+        /// </summary>
+        /// <param name="custId"></param>
+        /// <returns></returns>
         public List<Order> CustomerOrderHistory(string custId)
         {
             List<Order> orderList = _repository.CustomerOrderHistory(custId);
@@ -147,6 +185,11 @@ namespace BusinessLogicLayer
             return orderList;
         }
 
+        /// <summary>
+        /// Calls repository layer to query Order table for all orders at specified location
+        /// </summary>
+        /// <param name="storeViewModel"></param>
+        /// <returns></returns>
         public List<Order> StoreOrderHistory(StoreViewModel storeViewModel)
         {
             List<Order> orderList = _repository.StoreOrderHistory(storeViewModel);
@@ -163,6 +206,11 @@ namespace BusinessLogicLayer
             }
         }*/
 
+        /// <summary>
+        /// Takes in StoreLocation and converts to StoreViewModel
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         internal StoreViewModel ConvertStoreLocationToStoreViewModel(StoreLocation s)
         {
 
@@ -176,7 +224,12 @@ namespace BusinessLogicLayer
             return storeViewModel;
         }
 
-
+        /// <summary>
+        /// Takes in StoreLocation and converts to StoreViewMdoel. 
+        /// Made second method to avoid infinite loop
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         internal StoreViewModel ConvertStoreLocationToStoreViewModel2(StoreLocation s)
         {
 
@@ -189,7 +242,14 @@ namespace BusinessLogicLayer
             return storeViewModel;
         }
 
-
+        /// <summary>
+        /// Takes in Inventory, Product, and StoreLocation to convert Inventory to InventoryViewModel.
+        /// Calls second ConvertStoreLocationToStoreViewModel method to avoid infinite loop
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="p"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
         internal InventoryViewModel ConvertInventoryToInventoryViewModel(Inventory i, Product p, StoreLocation s)
         {
             InventoryViewModel inventoryViewModel = new InventoryViewModel()
@@ -206,6 +266,11 @@ namespace BusinessLogicLayer
             return inventoryViewModel;
         }
 
+        /// <summary>
+        /// Shortens the Inventory list to inventories at specified store location
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         internal List<InventoryViewModel> QueryInventoryList(StoreLocation s)
         {
             //List<Product> productList = _repository.ProductList();

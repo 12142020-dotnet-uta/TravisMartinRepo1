@@ -1,0 +1,27 @@
+﻿@model ModelLayer.ViewModels.CustomerViewModel
+
+@{
+    ViewData["Title"] = "SearchCustomers";
+}
+
+<h1>SearchCustomers</h1>
+
+<h4>CustomerViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ReturnCustomerSearch">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Search" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+

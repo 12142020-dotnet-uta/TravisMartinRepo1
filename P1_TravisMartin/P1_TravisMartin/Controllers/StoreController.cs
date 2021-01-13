@@ -28,17 +28,29 @@ namespace P1_TravisMartin.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Returns the home page view
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
             return View();
         }
 
-        // GET: LoginController
+        /// <summary>
+        /// Returns the login page view
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Login()
         {
             return View();
         }
 
+        /// <summary>
+        /// Takes in login info from user, logs them in, and returns the Home page view
+        /// </summary>
+        /// <param name="loginViewModel"></param>
+        /// <returns></returns>
         [ActionName("LoginCustomer")]
         public ActionResult Login(LoginViewModel loginViewModel)
         {
@@ -65,13 +77,20 @@ namespace P1_TravisMartin.Controllers
 
         }
 
-        // GET: RegistrationController
-        // [ActionName("Register")]
+        /// <summary>
+        /// Returns the Register new user view
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Registration()
         {
             return View("Registration");
         }
 
+        /// <summary>
+        /// Takes in info from new user, validates it, creates new user, and returns successful creation page
+        /// </summary>
+        /// <param name="registrationViewModel"></param>
+        /// <returns></returns>
         [ActionName("RegisterCustomer")]
         public ActionResult Registration(RegistrationViewModel registrationViewModel)
         {
@@ -97,12 +116,42 @@ namespace P1_TravisMartin.Controllers
             }
         }
 
+        /// <summary>
+        /// Logs the current user out
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Logout()
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Index");
         }
 
+        /// <summary>
+        /// Returns the search customers view
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult SearchCustomers()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// Takes in email to search for existing user and returns details view with details of search for user
+        /// </summary>
+        /// <param name="customerViewModel"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ActionName("ReturnCustomerSearch")]
+        public ActionResult SearchCustomers(CustomerViewModel customerViewModel)
+        {
+            List<CustomerViewModel> listOfCustomers = _businessLogicClass.SearchCustomers(customerViewModel);
+            return View(listOfCustomers[0]);
+        }
+
+        /// <summary>
+        /// returns the view to take in store location choice
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Stores()
         {
             StoreViewModel storeViewModel = new StoreViewModel();
@@ -112,6 +161,11 @@ namespace P1_TravisMartin.Controllers
             return View(storeViewModel);
         }
 
+        /// <summary>
+        /// Takes in chosen Store location and returns the inventory of that location
+        /// </summary>
+        /// <param name="storeViewModel"></param>
+        /// <returns></returns>
         [HttpPost]
         [ActionName("Stores")]
         public ActionResult Stores(StoreViewModel storeViewModel)
@@ -123,20 +177,38 @@ namespace P1_TravisMartin.Controllers
             return View("/Views/Products/Products.cshtml", productsList);
         }
 
+        /// <summary>
+        /// Takes in chosen product from location and returns cart page view with chosen product
+        /// </summary>
+        /// <param name="productViewModel"></param>
+        /// <returns></returns>
         public ActionResult Cart(ProductViewModel productViewModel)
         {
-            //List<OrderViewModel> ordersList = _businessLogicClass.OrdersList();
-
-            //Guid customerId = Guid.Parse(HttpContext.Session.GetString(SessionKeyCustId));
-            //Guid storeId = Guid.Parse(HttpContext.Session.GetString(SessionKeyStoreId));
-            //List <CartViewModel> cart = new List<CartViewModel>();
-            //cart = _businessLogicClass.AddToCart(customerId, storeId, productViewModel);
             ProductViewModel product = new ProductViewModel();
             product.ProductId = productViewModel.ProductId;
             listOfProducts = _businessLogicClass.AddToCart(product);
-            return View(listOfProducts[0]);
+            if (listOfProducts != null)
+            {
+                try
+                {
+                    return View(listOfProducts[0]);
+                } catch(ArgumentOutOfRangeException aore)
+                {
+                    _logger.LogInformation($"Trying to view empty cart threw error, {aore}");
+                    return View(productViewModel);
+                }
+                
+            } else {
+                return View(productViewModel);
+            }
+            
         }
 
+        /// <summary>
+        /// Specfies the amount of product you want to buy, checks you out, and returns to Home page
+        /// </summary>
+        /// <param name="productViewModel"></param>
+        /// <returns></returns>
         public ActionResult Checkout(ProductViewModel productViewModel)
         {
             
@@ -146,6 +218,10 @@ namespace P1_TravisMartin.Controllers
             return RedirectToAction("Index");
         }
 
+        /// <summary>
+        /// Uses logged in user to search for all purchases at all locations
+        /// </summary>
+        /// <returns></returns>
         public ActionResult CustomerOrderHistory()
         {
 
@@ -155,12 +231,22 @@ namespace P1_TravisMartin.Controllers
             return View(custOrderList);
         }
 
+        /// <summary>
+        /// Allows user to choose a store location to view order history
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ChooseStore()
         {
             StoreViewModel storeViewModel = new StoreViewModel();
             storeViewModel.storesList = _businessLogicClass.StoresList();
             return View("ChooseStore", storeViewModel);
         }
+
+        /// <summary>
+        /// Takes in chosen store location to view all orders from all users at the location
+        /// </summary>
+        /// <param name="storeViewModel"></param>
+        /// <returns></returns>
         public ActionResult StoreOrderHistory(StoreViewModel storeViewModel)
         {
 
